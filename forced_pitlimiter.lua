@@ -21,6 +21,7 @@ end
 
 -- Revisa mensajes de chat
 function ac.onChatMessage(car, message)
+  ac.log("Mensaje recibido: " .. message .. " de " .. car.name)
   local lowerMsg = string.lower(message)
 
   if lowerMsg == "/yellow" and car.isAdmin then
