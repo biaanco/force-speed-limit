@@ -23,10 +23,10 @@ end
 function ac.onChatMessage(car, message)
   local lowerMsg = string.lower(message)
 
-  if lowerMsg == "!yellow" and car.isAdmin then
+  if lowerMsg == "/yellow" and car.isAdmin then
     enableYellow()
     return true
-  elseif lowerMsg == "!green" and car.isAdmin then
+  elseif lowerMsg == "/green" and car.isAdmin then
     disableYellow()
     return true
   end
