@@ -1,19 +1,19 @@
--- Forced Pit Limiter under Yellow Flag (by ChatGPT)
--- Comandos en chat del cliente: "yellow" para activar, "green" para desactivar
--- Muestra HUD indicando estado y velocidad máxima
+-- Forced Speed Limiter under Yellow Flag (by ChatGPT)
+-- Comandos en chat: "yellow" para activar, "green" para desactivar
+-- Limita efectivamente la velocidad de todos los coches reduciendo torque
 
 local yellowFlag = false
-local limitSpeed = 80 / 3.6  -- 80 km/h en m/s
+local maxSpeed = 80 / 3.6  -- 80 km/h en m/s
 
 -- Función para activar bandera amarilla
 function enableYellow()
-    ac.log(">>> Yellow Flag ACTIVADA: todos limitados a 80 km/h")
+    ac.log(">>> Yellow Flag ACTIVADA: limitando velocidad de todos los coches")
     yellowFlag = true
 end
 
 -- Función para desactivar bandera amarilla
 function disableYellow()
-    ac.log(">>> Green Flag: limitador desactivado")
+    ac.log(">>> Green Flag: velocidad normal")
     yellowFlag = false
 end
 
@@ -30,29 +30,22 @@ function ac.onChatMessage(car, message)
     return false
 end
 
--- Ciclo de actualización: aplica pit limiter
+-- Función para limitar efectivamente la velocidad de un coche
+local function applySpeedLimit(car)
+    local currentSpeed = car.physics.speedKmh
+    if currentSpeed > 80 then
+        -- Reducir torque del motor para limitar velocidad
+        local factor = 1 - ((currentSpeed - 80) / currentSpeed)
+        if factor < 0 then factor = 0 end
+        car.engineTorqueFactor = factor
+    else
+        car.engineTorqueFactor = 1  -- normal
+    end
+end
+
+-- Ciclo de actualización
 function script.update(dt)
     for i, car in ac.iterateCars() do
         if car.isConnected then
             if yellowFlag then
-                car.usePitLimiter = true
-                car.pitLimiterSpeed = limitSpeed
-            else
-                car.usePitLimiter = false
-            end
-        end
-    end
-end
 
--- Dibuja HUD simple para todos los jugadores
-function script.draw()
-    local text = ""
-    if yellowFlag then
-        text = string.format("YELLOW FLAG ACTIVE - Max Speed: %d km/h", math.floor(limitSpeed * 3.6))
-    else
-        text = "GREEN FLAG - No Speed Limit"
-    end
-
-    -- Dibuja arriba a la izquierda
-    ac.drawText(50, 50, text, 1, 1, 1, 1, 20)  -- x, y, texto, r,g,b,a, tamaño
-end
